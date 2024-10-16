@@ -1,5 +1,7 @@
 ﻿
 
+using Android.Hardware.Camera2;
+
 namespace mobila_calc
 {
     public partial class MainPage : ContentPage
@@ -11,6 +13,7 @@ namespace mobila_calc
         {
             InitializeComponent();
             this.calc = new Calc();
+            
         }
 
         private void Button_Clicked(object sender, EventArgs e)
@@ -21,7 +24,6 @@ namespace mobila_calc
             Console.WriteLine(sender_content);
 
             string digit_a = this.calc.Digit_a.ToString();
-            string digit_b = this.calc.Digit_b.ToString();
 
             //Обрабатываем исходя из контента и состояния
             this.calc.DoWithSymbol(sender_content);
@@ -41,11 +43,12 @@ namespace mobila_calc
                 this.textBox_up.Text = digit_a + " " + this.calc.Command + " " + this.calc.Digit_b.ToString();
                 this.textBox_down.Text = this.calc.Digit_a.ToString();
             }
+        }
 
-            if(this.textBox_down.Text == "")
-            {
-                this.textBox_down.Text = "0";
-            }
+        private void ContentPage_Loaded(object sender, EventArgs e)
+        {
+            this.button_negativ.Text    = Calc.input_negative;
+            this.button_separator.Text  = Calc.input_separator;
         }
     }
 
@@ -62,29 +65,34 @@ namespace mobila_calc
         //  2 -> 2, Если встречаем "=":         выполняем вычисление.
         //  2 -> 1, Если встречаем операцию:    записываем операцию, обнуляем актуальный ввод
         //  2 -> 1, Если встерчаем число:       Обнуляем актуальный ввод
+        //  2 -> 0, Если встречаем инверсию:    Ставим инверсию и начинаем новый ввод
+        //  2 -> 0, Если встречаем разделитель: Обнуляем ввод, ставим разделитель, начинаем нвоый ввод
 
         private int status;
 
-        private string command;         //Выполняемая операция
+        private string command;             //Выполняемая операция
 
-        private string input_actual;    //Актуальный ввод
-        private float digit_a;          //Первое число
-        private float digit_b;          //Второе число
+        private string input_actual;        //Актуальный ввод
+        private string input_actual_null;   //Ввод по-умолчанию
+        private float digit_a;              //Первое число
+        private float digit_b;              //Второе число
 
-        private string input_actual_null; //Ввод по-умолчанию
-        readonly string symbol_pt;
+
+        public const string input_separator = ",";
+        public const string input_negative = "-+";
 
         public int Status           { get { return this.status; } }
         public string Command       { get { return this.command; } }
-        public string Input_actual  { get { return this.input_actual; } }
         public float Digit_a        { get { return this.digit_a; } }
         public float Digit_b        { get { return this.digit_b; } }
+        public string Input_actual  { get { return this.input_actual; } }
         private float Digit_actual  { get { return float.Parse(this.input_actual); } }
         
         public Calc()
         {
             this.status = 0;
             this.input_actual_null = "0";
+
             digit_actual_reset();
         }
 
@@ -115,7 +123,38 @@ namespace mobila_calc
                         break;
                     }
             }
+            this.input_actual = this.digit_a.ToString();
         }
+        private bool CanAddSeparator()
+        {
+            for (int i = 0; i < this.input_actual.Length; i++)
+            {
+                if (this.input_actual[i].ToString() == Calc.input_separator)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        private void InputSeparator(string symbol)
+        {
+            if (this.CanAddSeparator())
+            {
+                this.input_actual += symbol;
+            }
+        }
+        private void InputDigit(string symbol)
+        {
+            if (this.input_actual == this.input_actual_null)
+            {
+                this.input_actual = symbol;
+            }
+            else
+            {
+                this.input_actual += symbol;
+            }
+        }
+
         public void DoWithSymbol(string symbol)
         {
             switch (this.Status)
@@ -136,22 +175,31 @@ namespace mobila_calc
                                     this.status = 1;
                                     break;
                                 }
-                            case ",":
+                            case input_separator:
                                 {
-                                    this.input_actual += symbol;
+                                    this.InputSeparator(symbol);
                                     break;
                                 }
+                            case input_negative:
+                                {
+                                    if (this.input_actual != this.input_actual_null)
+                                    {
+                                        if (this.input_actual[0] != '-')
+                                        {
+                                            this.input_actual = "-" + this.input_actual;
+                                        }
+                                        else
+                                        {
+                                            this.input_actual = this.input_actual.Substring(1);
+                                        }
+                                    }
+                                    break;
+                                }
+                            case "=":
+                                { break; }
                             default:
                                 {
-                                    if(this.input_actual == this.input_actual_null)
-                                    {
-                                        this.input_actual = symbol;
-                                    }
-                                    else
-                                    {
-                                        this.input_actual += symbol;
-                                    }
-                                    
+                                    this.InputDigit(symbol);
                                     break;
                                 }
                         }
@@ -186,21 +234,29 @@ namespace mobila_calc
 
                                     break;
                                 }
-                            case ",":
+                            case input_separator:
                                 {
-                                    this.input_actual += symbol;
+                                    this.InputSeparator(symbol);
+                                    break;
+                                }
+                            case input_negative:
+                                {
+                                    if (this.input_actual != this.input_actual_null)
+                                    {
+                                        if (this.input_actual[0] != '-')
+                                        {
+                                            this.input_actual = "-" + this.input_actual;
+                                        }
+                                        else
+                                        {
+                                            this.input_actual = this.input_actual.Substring(1);
+                                        }
+                                    }
                                     break;
                                 }
                             default:
                                 {
-                                    if (this.input_actual == this.input_actual_null)
-                                    {
-                                        this.input_actual = symbol;
-                                    }
-                                    else
-                                    {
-                                        this.input_actual += symbol;
-                                    }
+                                    this.InputDigit(symbol);
                                     break;
                                 }
                         }
@@ -225,6 +281,29 @@ namespace mobila_calc
                                     this.digit_actual_reset();
 
                                     this.status = 1;
+                                    break;
+                                }
+                            case input_separator:
+                                {
+                                    this.input_actual = this.input_actual_null + Calc.input_separator;
+                                    this.status = 0;
+                                    break;
+                                }
+                            case input_negative:
+                                {
+                                    if (this.input_actual != this.input_actual_null)
+                                    {
+                                        if (this.input_actual[0] != '-')
+                                        {
+                                            this.input_actual = "-" + this.input_actual;
+                                        }
+                                        else
+                                        {
+                                            this.input_actual = this.input_actual.Substring(1);
+                                        }
+                                    }
+
+                                    this.status = 0;
                                     break;
                                 }
                             default:
