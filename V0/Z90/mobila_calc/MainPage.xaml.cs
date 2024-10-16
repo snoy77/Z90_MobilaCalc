@@ -23,17 +23,7 @@ namespace mobila_calc
             string digit_a = this.calc.Digit_a.ToString();
             string digit_b = this.calc.Digit_b.ToString();
 
-            //if (this.calc.Status == 0)
-            //{
-            //    this.textBox_up.Text = "";
-            //}
-            //else if (this.calc.Status == 1)
-            //{
-            //}
-            //else if (this.calc.Status == 2)
-            //{
-            //    this.textBox_up.Text = digit_a + " " + this.calc.Command + " " + digit_b;
-            //}
+
 
             //Обрабатываем исходя из контента и состояния
             this.calc.DoWithSymbol(sender_content);
