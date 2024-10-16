@@ -5,12 +5,7 @@ VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Z90", "Z90\Z90.csproj", "{508ED14E-0902-4EBD-B793-9A01ACC07385}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mobila_calc", "mobila_calc\mobila_calc.csproj", "{1825CEC2-30B8-4861-9277-FDCFA0FB72E4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject1", "UnitTestProject1\UnitTestProject1.csproj", "{4519125D-82C4-4679-97D5-A7671FB7478E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{1825CEC2-30B8-4861-9277-FDCFA0FB72E4} = {1825CEC2-30B8-4861-9277-FDCFA0FB72E4}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mobila_calc", "mobila_calc\mobila_calc.csproj", "{1825CEC2-30B8-4861-9277-FDCFA0FB72E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,10 +23,6 @@ Global
 		{1825CEC2-30B8-4861-9277-FDCFA0FB72E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1825CEC2-30B8-4861-9277-FDCFA0FB72E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1825CEC2-30B8-4861-9277-FDCFA0FB72E4}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{4519125D-82C4-4679-97D5-A7671FB7478E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4519125D-82C4-4679-97D5-A7671FB7478E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4519125D-82C4-4679-97D5-A7671FB7478E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4519125D-82C4-4679-97D5-A7671FB7478E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

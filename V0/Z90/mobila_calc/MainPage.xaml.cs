@@ -23,20 +23,18 @@ namespace mobila_calc
             string digit_a = this.calc.Digit_a.ToString();
             string digit_b = this.calc.Digit_b.ToString();
 
-
-
             //Обрабатываем исходя из контента и состояния
             this.calc.DoWithSymbol(sender_content);
 
             if(this.calc.Status == 0)
             {
                 this.textBox_up.Text = "";
-                this.textBox_down.Text = this.calc.digit_actual;
+                this.textBox_down.Text = this.calc.Input_actual;
                 
             }
             else if (this.calc.Status == 1){
                 this.textBox_up.Text = this.calc.Digit_a.ToString() + " " + this.calc.Command;
-                this.textBox_down.Text = this.calc.digit_actual;
+                this.textBox_down.Text = this.calc.Input_actual;
             }
             else if (this.calc.Status == 2)
             {
@@ -65,21 +63,32 @@ namespace mobila_calc
         //  2 -> 1, Если встречаем операцию:    записываем операцию, обнуляем актуальный ввод
         //  2 -> 1, Если встерчаем число:       Обнуляем актуальный ввод
 
-        private int status = 0;
-        public int Status { get { return this.status; } }
+        private int status;
 
+        private string command;         //Выполняемая операция
 
-        public string digit_actual;
-        private float digit_a;  //Первое число
-        private float digit_b;  //Второе число
-        //private float digit_r;  //результат число
+        private string input_actual;    //Актуальный ввод
+        private float digit_a;          //Первое число
+        private float digit_b;          //Второе число
 
-        public float Digit_a { get { return this.digit_a; } }
-        public float Digit_b { get { return this.digit_b; } }
-        //public float Digit_r { get { return this.digit_r; } }
+        private string input_actual_null; //Ввод по-умолчанию
+        readonly string symbol_pt;
 
-        private string command; //Выполняемая операция
-        public string Command { get { return this.command; } }
+        public int Status           { get { return this.status; } }
+        public string Command       { get { return this.command; } }
+        public string Input_actual  { get { return this.input_actual; } }
+        public float Digit_a        { get { return this.digit_a; } }
+        public float Digit_b        { get { return this.digit_b; } }
+        private float Digit_actual  { get { return float.Parse(this.input_actual); } }
+        
+        public Calc()
+        {
+            this.status = 0;
+            this.input_actual_null = "0";
+            digit_actual_reset();
+        }
+
+        public void digit_actual_reset() { this.input_actual = this.input_actual_null; }
 
         public void DoCommand()
         {
@@ -109,11 +118,6 @@ namespace mobila_calc
         }
         public void DoWithSymbol(string symbol)
         {
-            //Получаем контент нажатой кнопки
-            //Button sender_button = (Button)sender;
-            //string sender_content = sender_button.Text.ToString();
-            //Console.WriteLine(sender_content);
-
             switch (this.Status)
             {
                 case 0:
@@ -125,16 +129,29 @@ namespace mobila_calc
                             case "x":
                             case "+":
                                 {
-                                    this.digit_a = float.Parse(this.digit_actual);
-                                    this.digit_actual = "";
+                                    this.digit_a = this.Digit_actual;
+                                    this.digit_actual_reset();
                                     this.command = symbol;
 
                                     this.status = 1;
                                     break;
                                 }
+                            case ",":
+                                {
+                                    this.input_actual += symbol;
+                                    break;
+                                }
                             default:
                                 {
-                                    this.digit_actual += symbol;   
+                                    if(this.input_actual == this.input_actual_null)
+                                    {
+                                        this.input_actual = symbol;
+                                    }
+                                    else
+                                    {
+                                        this.input_actual += symbol;
+                                    }
+                                    
                                     break;
                                 }
                         }
@@ -147,7 +164,7 @@ namespace mobila_calc
                         {
                             case "=":
                                 {
-                                    this.digit_b = float.Parse(this.digit_actual);
+                                    this.digit_b = this.Digit_actual;
                                     
                                     this.DoCommand();
 
@@ -160,24 +177,30 @@ namespace mobila_calc
                             case "x":
                             case "/":
                                 {
-                                    if (digit_actual == "")
-                                    {
-                                        this.command = symbol;
-                                    }
-                                    else 
-                                    {
-                                        this.digit_b = float.Parse(this.digit_actual);
+                                    this.digit_b = this.Digit_actual;
 
-                                        this.DoCommand();
+                                    this.DoCommand();
 
-                                        this.command = symbol;
-                                        this.digit_actual = "";
-                                    }
+                                    this.command = symbol;
+                                    this.digit_actual_reset();
+
+                                    break;
+                                }
+                            case ",":
+                                {
+                                    this.input_actual += symbol;
                                     break;
                                 }
                             default:
                                 {
-                                    this.digit_actual += symbol;
+                                    if (this.input_actual == this.input_actual_null)
+                                    {
+                                        this.input_actual = symbol;
+                                    }
+                                    else
+                                    {
+                                        this.input_actual += symbol;
+                                    }
                                     break;
                                 }
                         }
@@ -191,7 +214,6 @@ namespace mobila_calc
                             case "=":
                                 {
                                     this.DoCommand();
-                                    this.digit_actual = "";
                                     break;
                                 }
                             case "+":
@@ -200,14 +222,14 @@ namespace mobila_calc
                             case "/":
                                 {
                                     this.command = symbol;
-                                    this.digit_actual = "";
+                                    this.digit_actual_reset();
 
                                     this.status = 1;
                                     break;
                                 }
                             default:
                                 {
-                                    this.digit_actual = symbol;
+                                    this.input_actual = symbol;
                                     this.status = 0;
                                     break;
                                 }
